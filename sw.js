@@ -1,9 +1,11 @@
-// Basic caching service worker
-const CACHE_NAME = 'image-editor-cache-v1';
+const CACHE_NAME = 'editor-v1';
 const urlsToCache = [
   './',
-  './index.html'
-  // Add more later: your CSS, JS, icons, e.g. './icon-192.png'
+  './index.html',
+  './manifest.json',
+  './icon-192.png',
+  './icon-512.png'
+  // add your CSS/JS/images here
 ];
 
 self.addEventListener('install', event => {
