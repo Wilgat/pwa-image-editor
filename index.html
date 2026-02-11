@@ -190,6 +190,9 @@
             body { margin: 12px; }
             h1 { font-size: 1.5rem; }
         }
+        #bottom-space {
+            height: 100px;
+        }
     </style>
 </head>
 <body>
@@ -234,7 +237,7 @@
             <input type="range" id="font-size" min="10" max="120" value="24" step="1">
         </div>
         <p style="color:#aaa; font-size:0.9em; margin-top:12px;">
-            Click / tap inside the dark banner area to edit text
+            <button id="edit">edit text</button>
         </p>
     </div>
 
@@ -259,13 +262,14 @@
             </div>
         </div>
     </div>
-
+    <p id="bottom-space">&nbsp;</p>
     <!-- Floating install button -->
     <button id="show-install-btn">Install App</button>
     <script>
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         const upload = document.getElementById('upload');
+        const editBtn = document.getElementById('edit');
         const downloadBtn = document.getElementById('download');
         const cropTab = document.getElementById('crop-tab');
         const bannerTab = document.getElementById('banner-tab');
@@ -332,11 +336,7 @@
         });
 
         // Click / Tap to edit banner
-        canvas.addEventListener('click', handleBannerClick);
-        canvas.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            handleBannerClick(e);
-        });
+        editBtn.addEventListener('click', handleBannerClick);
 
         function handleBannerClick(e) {
             if (!isBannerMode) return;
@@ -350,6 +350,7 @@
             mobileTextarea.focus();
             mobileTextarea.style.display = 'flex';
             mobileTextarea.setSelectionRange(0, mobileTextarea.value.length);
+
         }
 
         function updateCanvas() {
