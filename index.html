@@ -84,6 +84,9 @@
             margin-top: 20px;
             cursor: pointer;
         }
+        #crop-controls {
+            margin-right: 20px;
+        }
         #install-banner {
             position: fixed;
             bottom: 16px;
@@ -94,12 +97,24 @@
             padding: 16px;
             border-radius: 12px;
             box-shadow: 0 6px 24px rgba(0,0,0,0.6);
-            text-align: center;
             z-index: 1000;
             display: none;
         }
-        #install-banner button {
-            margin-top: 12px;
+        #install-banner .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        #install-close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.6rem;
+            cursor: pointer;
+            padding: 0 8px;
+        }
+        #install-btn, #show-install-btn {
             padding: 10px 24px;
             background: white;
             color: #0066ff;
@@ -109,10 +124,6 @@
             cursor: pointer;
         }
 
-        #crop-controls {
-            margin-right: 20px;
-        }
-        /* ──────────────────────────────────────────────── */
         /* Mobile Text Input Overlay */
         #mobile-text-overlay {
             display: none;
@@ -159,6 +170,22 @@
         }
         #mobile-cancel { background: #555; color: white; border: none; }
         #mobile-done   { background: #0066ff; color: white; border: none; }
+
+        #show-install-btn {
+            display: none;
+            position: fixed;
+            bottom: 80px; /* above download button area */
+            right: 16px;
+            z-index: 999;
+            padding: 12px 20px;
+            font-size: 1rem;
+            background: #0066ff;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            cursor: pointer;
+        }
 
         @media (max-width: 500px) {
             body { margin: 12px; }
@@ -216,7 +243,10 @@
 
     <!-- Custom install prompt -->
     <div id="install-banner">
-        <div>Install this editor to your home screen for quick access!</div>
+        <div class="header">
+            <div>Install this editor to your home screen for quick access!</div>
+            <button id="install-close-btn">×</button>
+        </div>
         <button id="install-btn">Add to Home Screen</button>
     </div>
 
@@ -230,6 +260,9 @@
             </div>
         </div>
     </div>
+
+    <!-- Floating install button -->
+    <button id="show-install-btn">Install App</button>
 
     <script>
         const canvas = document.getElementById('canvas');
@@ -273,7 +306,7 @@
 
         const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
-        // ─── Desktop editable div (only used on non-mobile) ─────────────────────
+        // Desktop editable div
         const editable = document.createElement('div');
         editable.className = 'editable';
         editable.contentEditable = true;
@@ -285,7 +318,7 @@
             updateCanvas();
         });
 
-        // ─── Mobile textarea handlers ───────────────────────────────────────────
+        // Mobile textarea handlers
         mobileDone.addEventListener('click', () => {
             bannerText = mobileTextarea.value.trim() || "Your text here";
             mobileOverlay.style.display = 'none';
@@ -297,15 +330,13 @@
         });
 
         mobileOverlay.addEventListener('click', e => {
-            if (e.target === mobileOverlay) {
-                mobileOverlay.style.display = 'none';
-            }
+            if (e.target === mobileOverlay) mobileOverlay.style.display = 'none';
         });
 
-        // ─── Click / Tap to edit banner ─────────────────────────────────────────
+        // Click / Tap to edit banner
         canvas.addEventListener('click', handleBannerClick);
         canvas.addEventListener('touchend', (e) => {
-            e.preventDefault(); // prevent double-tap zoom etc.
+            e.preventDefault();
             handleBannerClick(e);
         });
 
@@ -313,27 +344,18 @@
             if (!isBannerMode) return;
 
             const rect = canvas.getBoundingClientRect();
-            let clientY;
-
-            if (e.type === 'touchend' && e.changedTouches) {
-                clientY = e.changedTouches[0].clientY;
-            } else {
-                clientY = e.clientY;
-            }
-
+            let clientY = e.type === 'touchend' && e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
             const clickY = clientY - rect.top;
             const bannerH = cropH * (bannerPercent / 100);
 
             if (clickY > cropH - bannerH) {
-                if (isMobile) {
-                    // Mobile: show native textarea
+                if (true || isMobile) {
                     mobileTextarea.value = bannerText;
                     mobileOverlay.style.display = 'flex';
                     mobileTextarea.focus();
-                    // Select all text
+                    mobileTextarea.style.display = 'flex';
                     mobileTextarea.setSelectionRange(0, mobileTextarea.value.length);
                 } else {
-                    // Desktop: use contenteditable div
                     editable.style.left   = `${rect.left}px`;
                     editable.style.top    = `${rect.top + cropH - bannerH}px`;
                     editable.style.width  = `${cropW}px`;
@@ -490,30 +512,61 @@
             link.click();
         };
 
-        // PWA Install Prompt
+        // ─── PWA Install Prompt ─────────────────────────────────────────────────
         let deferredPrompt = null;
         const installBanner = document.getElementById('install-banner');
         const installBtn = document.getElementById('install-btn');
+        const installCloseBtn = document.getElementById('install-close-btn');
+        const showInstallBtn = document.getElementById('show-install-btn');
 
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
             installBanner.style.display = 'block';
+            showInstallBtn.style.display = 'none';
         });
 
         installBtn.addEventListener('click', async () => {
-            if (!deferredPrompt) return;
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            console.log(`Install outcome: ${outcome}`);
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log(`Install outcome: ${outcome}`);
+                installBanner.style.display = 'none';
+                showInstallBtn.style.display = 'block';
+                deferredPrompt = null;
+            } else {
+                alert(
+                    "Your browser doesn't show an automatic install prompt.\n\n" +
+                    "To install this app:\n" +
+                    "• In Firefox: Check the menu for an 'Install' option\n" +
+                    "• Or install the 'PWAs for Firefox' extension\n" +
+                    "• On mobile: Add to home screen from browser menu"
+                );
+                installBanner.style.display = 'none';
+                showInstallBtn.style.display = 'block';
+            }
+        });
+
+        installCloseBtn.addEventListener('click', () => {
             installBanner.style.display = 'none';
-            deferredPrompt = null;
+            showInstallBtn.style.display = 'block';
+        });
+
+        showInstallBtn.addEventListener('click', () => {
+            installBanner.style.display = 'block';
+            showInstallBtn.style.display = 'none';
         });
 
         window.addEventListener('appinstalled', () => {
             installBanner.style.display = 'none';
+            showInstallBtn.style.display = 'none';
             console.log('App was installed!');
         });
+
+        // Show floating button initially if banner not shown
+        if (installBanner.style.display !== 'block') {
+            showInstallBtn.style.display = 'block';
+        }
 
         // Start with crop tab
         cropTab.click();
