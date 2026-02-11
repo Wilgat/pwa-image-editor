@@ -345,32 +345,11 @@
             let clientY = e.type === 'touchend' && e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
             const clickY = clientY - rect.top;
             const bannerH = cropH * (bannerPercent / 100);
-
-            if (clickY > cropH - bannerH) {
-                if (true || isMobile) {
-                    mobileTextarea.value = bannerText;
-                    mobileOverlay.style.display = 'flex';
-                    mobileTextarea.focus();
-                    mobileTextarea.style.display = 'flex';
-                    mobileTextarea.setSelectionRange(0, mobileTextarea.value.length);
-                } else {
-                    editable.style.left   = `${rect.left}px`;
-                    editable.style.top    = `${rect.top + cropH - bannerH}px`;
-                    editable.style.width  = `${cropW}px`;
-                    editable.style.height = `${bannerH}px`;
-                    editable.style.fontSize = `${fontSize}px`;
-                    editable.style.lineHeight = `${fontSize * 1.3}px`;
-                    editable.innerText = bannerText;
-                    editable.style.display = 'flex';
-                    editable.focus();
-
-                    const sel = window.getSelection();
-                    sel.removeAllRanges();
-                    const range = document.createRange();
-                    range.selectNodeContents(editable);
-                    sel.addRange(range);
-                }
-            }
+            mobileTextarea.value = bannerText;
+            mobileOverlay.style.display = 'flex';
+            mobileTextarea.focus();
+            mobileTextarea.style.display = 'flex';
+            mobileTextarea.setSelectionRange(0, mobileTextarea.value.length);
         }
 
         function updateCanvas() {
