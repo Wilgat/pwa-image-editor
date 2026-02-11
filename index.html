@@ -172,7 +172,6 @@
         #mobile-done   { background: #0066ff; color: white; border: none; }
 
         #show-install-btn {
-            display: none;
             position: fixed;
             bottom: 80px; /* above download button area */
             right: 16px;
@@ -263,7 +262,6 @@
 
     <!-- Floating install button -->
     <button id="show-install-btn">Install App</button>
-
     <script>
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
@@ -523,7 +521,6 @@
             e.preventDefault();
             deferredPrompt = e;
             installBanner.style.display = 'block';
-            showInstallBtn.style.display = 'none';
         });
 
         installBtn.addEventListener('click', async () => {
