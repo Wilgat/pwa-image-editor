@@ -1,562 +1,158 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Crop & Banner Editor</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Name Card – wilgat</title>
 
-    <!-- PWA Essentials -->
-    <meta name="theme-color" content="#000000">
-    <link rel="manifest" href="./manifest.json">
+  <!-- PWA essentials -->
+  <meta name="theme-color" content="#000000"/>
+  <link rel="manifest" href="./manifest.json"/>
 
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            margin: 20px;
-            background: #111;
-            color: #eee;
-            min-height: 100vh;
-        }
-        h1 { margin-top: 0; font-size: 1.8rem; }
-        canvas {
-            border: 1px solid #444;
-            margin: 15px auto;
-            display: block;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.7);
-            background: #000;
-            max-width: 100%;
-        }
-        .slider { margin: 14px 0; }
-        label { display: block; margin-bottom: 6px; font-size: 0.95rem; }
-        input[type="range"] { width: 100%; }
-        .tab-buttons {
-            margin: 20px 0;
-            display: flex;
-            gap: 12px;
-        }
-        .tab-buttons button {
-            flex: 1;
-            padding: 12px;
-            font-size: 1rem;
-            background: #333;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .tab-buttons button.active {
-            background: #0066ff;
-            box-shadow: 0 0 0 3px rgba(0,102,255,0.3);
-        }
-        .controls { margin: 20px 0; }
-        .editable {
-            position: absolute;
-            display: none;
-            color: white;
-            background: rgba(0,0,0,0.75);
-            text-align: center;
-            overflow: hidden;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            align-items: center;
-            justify-content: center;
-            padding: 16px;
-            box-sizing: border-box;
-            border: 2px dashed rgba(255,255,255,0.4);
-            cursor: text;
-            border-radius: 6px;
-        }
-        .editable:focus {
-            outline: none;
-            border-color: #4dabf7;
-            box-shadow: 0 0 0 3px rgba(77,171,247,0.4);
-        }
-        button#download {
-            display: block;
-            width: 100%;
-            padding: 14px;
-            font-size: 1.1rem;
-            background: #28a745;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            margin-top: 20px;
-            cursor: pointer;
-        }
-        #crop-controls {
-            margin-right: 20px;
-        }
-        #install-banner {
-            position: fixed;
-            bottom: 16px;
-            left: 16px;
-            right: 16px;
-            background: #0066ff;
-            color: white;
-            padding: 16px;
-            border-radius: 12px;
-            box-shadow: 0 6px 24px rgba(0,0,0,0.6);
-            z-index: 1000;
-            display: none;
-        }
-        #install-banner .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-        #install-close-btn {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 1.6rem;
-            cursor: pointer;
-            padding: 0 8px;
-        }
-        #install-btn, #show-install-btn {
-            padding: 10px 24px;
-            background: white;
-            color: #0066ff;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-        }
+  <style>
+    body {
+      margin: 0;
+      padding: 16px;
+      background: #0a0a0a;
+      color: #eee;
+      font-family: system-ui, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    h1 {
+      margin: 16px 0 24px;
+      font-size: 1.8rem;
+      text-align: center;
+    }
+    .card-container {
+      width: 100%;
+      max-width: 800px;
+      margin: 0 auto 32px;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+      background: #111;
+    }
+    .card-container img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    .qr-section {
+      text-align: center;
+      margin: 32px 0 48px;
+    }
+    .qr-section img {
+      width: 220px;
+      height: 220px;
+      border-radius: 12px;
+      background: white;
+      padding: 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+    }
+    .qr-section p {
+      margin: 16px 0 8px;
+      font-size: 1.1rem;
+      color: #ccc;
+    }
 
-        /* Mobile Text Input Overlay */
-        #mobile-text-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.65);
-            z-index: 2000;
-            align-items: center;
-            justify-content: center;
-            padding: 16px;
-        }
-        #mobile-text-container {
-            background: #222;
-            width: 100%;
-            max-width: 520px;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.6);
-        }
-        #mobile-textarea {
-            width: 100%;
-            min-height: 140px;
-            padding: 12px;
-            font-size: 18px;
-            line-height: 1.4;
-            background: #111;
-            color: white;
-            border: 1px solid #444;
-            border-radius: 8px;
-            resize: vertical;
-            font-family: inherit;
-        }
-        .mobile-btn-row {
-            margin-top: 16px;
-            display: flex;
-            justify-content: flex-end;
-            gap: 12px;
-        }
-        .mobile-btn {
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-size: 1rem;
-            cursor: pointer;
-        }
-        #mobile-cancel { background: #555; color: white; border: none; }
-        #mobile-done   { background: #0066ff; color: white; border: none; }
+    /* Install button – floating style */
+    #install-btn {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 100;
+      padding: 12px 24px;
+      font-size: 1rem;
+      font-weight: bold;
+      background: #0066ff;
+      color: white;
+      border: none;
+      border-radius: 50px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    #install-btn:hover {
+      background: #3385ff;
+      transform: translateY(-2px);
+    }
 
-        #show-install-btn {
-            position: fixed;
-            bottom: 80px; /* above download button area */
-            right: 16px;
-            z-index: 999;
-            padding: 12px 20px;
-            font-size: 1rem;
-            background: #0066ff;
-            color: white;
-            border: none;
-            border-radius: 50px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-            cursor: pointer;
-        }
-
-        @media (max-width: 500px) {
-            body { margin: 12px; }
-            h1 { font-size: 1.5rem; }
-        }
-        #bottom-space {
-            height: 100px;
-        }
-    </style>
+    @media (max-width: 500px) {
+      h1 { font-size: 1.2rem; }
+      .qr-section img { width: 200px; height: 200px; }
+      #install-btn {
+        bottom: 16px;
+        right: 16px;
+        padding: 10px 20px;
+      }
+    }
+    .qr-section img {
+        width: 140px;
+        height: 140px;
+    /* ... rest unchanged */
+    }
+  </style>
 </head>
 <body>
 
-    <h1>Image Crop & Banner Editor</h1>
+  <h1>Wilgat Digital Name Card</h1>
 
-    <input type="file" id="upload" accept="image/*">
+  <div class="card-container">
+    <img src="namecard.png" alt="Name Card"/>
+  </div>
 
-    <div class="tab-buttons">
-        <button id="crop-tab" class="active">Crop</button>
-        <button id="banner-tab">Banner</button>
-    </div>
+  <div class="qr-section">
+    <img src="qr.png" alt="QR Code to this page"/>
+    <p>Scan to open this page</p>
+  </div>
+  
+  <button id="install-btn">Install App</button>
 
-    <canvas id="canvas"></canvas>
+  <!-- PWA install handling -->
+  <script>
+    let deferredPrompt = null;
+    const installBtn = document.getElementById('install-btn');
 
-    <div id="crop-controls" class="controls">
-        <div class="slider">
-            <label>X Offset: <span id="x-value">0 / 0</span></label>
-            <input type="range" id="x" min="0" max="0" value="0" step="1">
-        </div>
-        <div class="slider">
-            <label>Y Offset: <span id="y-value">0 / 0</span></label>
-            <input type="range" id="y" min="0" max="0" value="0" step="1">
-        </div>
-        <div class="slider">
-            <label>Width: <span id="width-value">0</span></label>
-            <input type="range" id="width" min="1" max="1" value="1" step="1">
-        </div>
-        <div class="slider">
-            <label>Height: <span id="height-value">0</span></label>
-            <input type="range" id="height" min="1" max="1" value="1" step="1">
-        </div>
-    </div>
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      installBtn.style.display = 'block';   // make sure it's visible
+    });
 
-    <div id="banner-controls" class="controls" style="display:none;">
-        <div class="slider">
-            <label>Banner Height (%): <span id="banner-percent-value">20</span></label>
-            <input type="range" id="banner-percent" min="0" max="50" value="20" step="1">
-        </div>
-        <div class="slider">
-            <label>Font Size (px): <span id="font-size-value">24</span></label>
-            <input type="range" id="font-size" min="10" max="120" value="24" step="1">
-        </div>
-        <p style="color:#aaa; font-size:0.9em; margin-top:12px;">
-            <button id="edit">edit text</button>
-        </p>
-    </div>
-
-    <button id="download">Download Edited Image</button>
-
-    <!-- Custom install prompt -->
-    <div id="install-banner">
-        <div class="header">
-            <div>Install this editor to your home screen for quick access!</div>
-            <button id="install-close-btn">×</button>
-        </div>
-        <button id="install-btn">Add to Home Screen</button>
-    </div>
-
-    <!-- Mobile Text Editing Overlay -->
-    <div id="mobile-text-overlay">
-        <div id="mobile-text-container">
-            <textarea id="mobile-textarea" placeholder="Enter banner text..."></textarea>
-            <div class="mobile-btn-row">
-                <button id="mobile-cancel" class="mobile-btn">Cancel</button>
-                <button id="mobile-done" class="mobile-btn">Done</button>
-            </div>
-        </div>
-    </div>
-    <p id="bottom-space">&nbsp;</p>
-    <!-- Floating install button -->
-    <button id="show-install-btn">Install App</button>
-    <script>
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
-        const upload = document.getElementById('upload');
-        const editBtn = document.getElementById('edit');
-        const downloadBtn = document.getElementById('download');
-        const cropTab = document.getElementById('crop-tab');
-        const bannerTab = document.getElementById('banner-tab');
-        const cropControls = document.getElementById('crop-controls');
-        const bannerControls = document.getElementById('banner-controls');
-
-        const xSlider = document.getElementById('x');
-        const ySlider = document.getElementById('y');
-        const wSlider = document.getElementById('width');
-        const hSlider = document.getElementById('height');
-        const bannerPct = document.getElementById('banner-percent');
-        const fontSizeSlider = document.getElementById('font-size');
-
-        const xVal = document.getElementById('x-value');
-        const yVal = document.getElementById('y-value');
-        const wVal = document.getElementById('width-value');
-        const hVal = document.getElementById('height-value');
-        const pctVal = document.getElementById('banner-percent-value');
-        const fsVal = document.getElementById('font-size-value');
-
-        // Mobile overlay elements
-        const mobileOverlay = document.getElementById('mobile-text-overlay');
-        const mobileTextarea = document.getElementById('mobile-textarea');
-        const mobileCancel = document.getElementById('mobile-cancel');
-        const mobileDone = document.getElementById('mobile-done');
-
-        let img = new Image();
-        let cropX = 0;
-        let cropY = 0;
-        let cropW = 1;
-        let cropH = 1;
-        let bannerPercent = 20;
-        let fontSize = 28;
-        let bannerText = "Your text here";
-        let isBannerMode = false;
-
-        const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-
-        // Desktop editable div
-        const editable = document.createElement('div');
-        editable.className = 'editable';
-        editable.contentEditable = true;
-        document.body.appendChild(editable);
-
-        editable.addEventListener('blur', () => {
-            bannerText = editable.innerText.trim() || "Your text here";
-            editable.style.display = 'none';
-            updateCanvas();
-        });
-
-        // Mobile textarea handlers
-        mobileDone.addEventListener('click', () => {
-            bannerText = mobileTextarea.value.trim() || "Your text here";
-            mobileOverlay.style.display = 'none';
-            updateCanvas();
-        });
-
-        mobileCancel.addEventListener('click', () => {
-            mobileOverlay.style.display = 'none';
-        });
-
-        mobileOverlay.addEventListener('click', e => {
-            if (e.target === mobileOverlay) mobileOverlay.style.display = 'none';
-        });
-
-        // Click / Tap to edit banner
-        editBtn.addEventListener('click', handleBannerClick);
-
-        function handleBannerClick(e) {
-            if (!isBannerMode) return;
-
-            const rect = canvas.getBoundingClientRect();
-            let clientY = e.type === 'touchend' && e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
-            const clickY = clientY - rect.top;
-            const bannerH = cropH * (bannerPercent / 100);
-            mobileTextarea.value = bannerText;
-            mobileOverlay.style.display = 'flex';
-            mobileTextarea.focus();
-            mobileTextarea.style.display = 'flex';
-            mobileTextarea.setSelectionRange(0, mobileTextarea.value.length);
-
-        }
-
-        function updateCanvas() {
-            canvas.width = cropW;
-            canvas.height = cropH;
-            ctx.clearRect(0, 0, cropW, cropH);
-
-            const srcX = Math.max(0, cropX);
-            const srcY = Math.max(0, cropY);
-            const drawX = Math.max(0, -cropX);
-            const drawY = Math.max(0, -cropY);
-            const drawW = Math.min(cropW, (img.naturalWidth || img.width) - srcX);
-            const drawH = Math.min(cropH, (img.naturalHeight || img.height) - srcY);
-
-            if (drawW > 0 && drawH > 0) {
-                ctx.drawImage(img, srcX, srcY, drawW, drawH, drawX, drawY, drawW, drawH);
-            }
-
-            if (isBannerMode && bannerPercent > 0) {
-                const bh = cropH * (bannerPercent / 100);
-                ctx.fillStyle = 'rgba(0,0,0,0.7)';
-                ctx.fillRect(0, cropH - bh, cropW, bh);
-
-                ctx.fillStyle = 'white';
-                ctx.font = `${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-
-                const lines = bannerText.split('\n');
-                const lineHeight = fontSize * 1.3;
-                let y = cropH - bh + bh/2 - (lines.length - 1) * lineHeight / 2;
-
-                lines.forEach(line => {
-                    ctx.fillText(line.trim(), cropW / 2, y);
-                    y += lineHeight;
-                });
-            }
-        }
-
-        function updateCropSliders() {
-            if (!img.complete || (img.naturalWidth || img.width) === 0) {
-                xVal.textContent = '0 / 0';
-                yVal.textContent = '0 / 0';
-                wVal.textContent = cropW;
-                hVal.textContent = cropH;
-                return;
-            }
-
-            const imgW = img.naturalWidth || img.width;
-            const imgH = img.naturalHeight || img.height;
-
-            xSlider.max = imgW;
-            ySlider.max = imgH;
-            wSlider.max = imgW;
-            hSlider.max = imgH;
-
-            cropW = Math.max(1, Math.min(cropW, imgW));
-            cropH = Math.max(1, Math.min(cropH, imgH));
-
-            xSlider.value = cropX;
-            ySlider.value = cropY;
-            wSlider.value = cropW;
-            hSlider.value = cropH;
-
-            xVal.textContent = `${cropX} / ${imgW}`;
-            yVal.textContent = `${cropY} / ${imgH}`;
-            wVal.textContent = cropW;
-            hVal.textContent = cropH;
-        }
-
-        upload.addEventListener('change', e => {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = ev => {
-                img.src = ev.target.result;
-                img.onload = () => {
-                    const naturalW = img.naturalWidth || img.width;
-                    const naturalH = img.naturalHeight || img.height;
-
-                    if (naturalW === 0 || naturalH === 0) return;
-
-                    cropW = naturalW;
-                    cropH = naturalH;
-                    cropX = 0;
-                    cropY = 0;
-
-                    updateCropSliders();
-                    updateCanvas();
-                };
-            };
-            reader.readAsDataURL(file);
-        });
-
-        xSlider.oninput = e => { cropX = +e.target.value; updateCropSliders(); updateCanvas(); };
-        ySlider.oninput = e => { cropY = +e.target.value; updateCropSliders(); updateCanvas(); };
-        wSlider.oninput = e => { cropW = +e.target.value; updateCropSliders(); updateCanvas(); };
-        hSlider.oninput = e => { cropH = +e.target.value; updateCropSliders(); updateCanvas(); };
-
-        bannerPct.oninput = e => {
-            bannerPercent = +e.target.value;
-            pctVal.textContent = bannerPercent;
-            updateCanvas();
-        };
-
-        fontSizeSlider.oninput = e => {
-            fontSize = +e.target.value;
-            fsVal.textContent = fontSize;
-            updateCanvas();
-        };
-
-        cropTab.onclick = () => {
-            isBannerMode = false;
-            cropControls.style.display = 'block';
-            bannerControls.style.display = 'none';
-            cropTab.classList.add('active');
-            bannerTab.classList.remove('active');
-            editable.style.display = 'none';
-            mobileOverlay.style.display = 'none';
-            updateCanvas();
-        };
-
-        bannerTab.onclick = () => {
-            isBannerMode = true;
-            cropControls.style.display = 'none';
-            bannerControls.style.display = 'block';
-            cropTab.classList.remove('active');
-            bannerTab.classList.add('active');
-            updateCanvas();
-        };
-
-        downloadBtn.onclick = () => {
-            const link = document.createElement('a');
-            link.download = 'edited-image.png';
-            link.href = canvas.toDataURL('image/png');
-            link.click();
-        };
-
-        // ─── PWA Install Prompt ─────────────────────────────────────────────────
-        let deferredPrompt = null;
-        const installBanner = document.getElementById('install-banner');
-        const installBtn = document.getElementById('install-btn');
-        const installCloseBtn = document.getElementById('install-close-btn');
-        const showInstallBtn = document.getElementById('show-install-btn');
-
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            installBanner.style.display = 'block';
-        });
-
-        installBtn.addEventListener('click', async () => {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                console.log(`Install outcome: ${outcome}`);
-                installBanner.style.display = 'none';
-                showInstallBtn.style.display = 'block';
-                deferredPrompt = null;
-            } else {
-                alert(
-                    "Your browser doesn't show an automatic install prompt.\n\n" +
-                    "To install this app:\n" +
-                    "• In Firefox: Check the menu for an 'Install' option\n" +
-                    "• Or install the 'PWAs for Firefox' extension\n" +
-                    "• On mobile: Add to home screen from browser menu"
-                );
-                installBanner.style.display = 'none';
-                showInstallBtn.style.display = 'block';
-            }
-        });
-
-        installCloseBtn.addEventListener('click', () => {
-            installBanner.style.display = 'none';
-            showInstallBtn.style.display = 'block';
-        });
-
-        showInstallBtn.addEventListener('click', () => {
-            installBanner.style.display = 'block';
-            showInstallBtn.style.display = 'none';
-        });
-
-        window.addEventListener('appinstalled', () => {
-            installBanner.style.display = 'none';
-            showInstallBtn.style.display = 'none';
-            console.log('App was installed!');
-        });
-
-        // Show floating button initially if banner not shown
-        if (installBanner.style.display !== 'block') {
-            showInstallBtn.style.display = 'block';
-        }
-
-        // Start with crop tab
-        cropTab.click();
-    </script>
-
-    <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js')
-            .then(reg => console.log('Service Worker registered successfully'))
-            .catch(err => console.error('Service Worker registration failed:', err));
-        });
+    installBtn.addEventListener('click', async () => {
+      if (!deferredPrompt) {
+        alert("Install prompt not available.\n\nTry:\n• Chrome/Edge → menu → Install\n• Mobile → Add to Home Screen");
+        return;
       }
-    </script>
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      console.log("Install outcome:", outcome);
+      deferredPrompt = null;
+      installBtn.style.display = 'none';
+    });
+
+    window.addEventListener('appinstalled', () => {
+      installBtn.style.display = 'none';
+      console.log('PWA was installed');
+    });
+
+    // Show button if already possible
+    installBtn.style.display = 'block';
+  </script>
+
+  <!-- Service Worker -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(() => console.log('Service Worker registered'))
+          .catch(err => console.error('SW registration failed:', err));
+      });
+    }
+  </script>
+
 </body>
 </html>

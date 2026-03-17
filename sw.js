@@ -1,11 +1,12 @@
-const CACHE_NAME = 'editor-v1';
+const CACHE_NAME = 'namecard-v1';
 const urlsToCache = [
   './',
   './index.html',
   './manifest.json',
+  './namecard.png',
+  './qr.png',
   './icon-192.png',
   './icon-512.png'
-  // add your CSS/JS/images here
 ];
 
 self.addEventListener('install', event => {

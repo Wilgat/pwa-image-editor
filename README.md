@@ -1,70 +1,102 @@
-# PWA Image Crop & Banner Editor
+Here’s a clean, modern, and concise `README.md` tailored for your new PWA — a simple digital name card with offline support, install button, and QR code.
 
-A simple, offline-capable Progressive Web App (PWA) for cropping images and adding a customizable banner/text overlay — perfect for quickly creating social media banners, YouTube thumbnails, profile covers, etc.
+Choose the version that matches your final decision (dynamic QR vs static `qr.png`).
 
-**Live Demo:**  
-🌐 https://wilgat.github.io/pwa-image-editor/
+### Version A – Using dynamic QR code (no extra qr.png file)
+
+```markdown
+# Digital Name Card PWA
+
+A clean, minimal, installable Progressive Web App that displays a personal/business name card.
+
+Perfect for sharing your contact info, portfolio link, or digital business card via a scannable QR code — works offline after first visit.
+
+🌐 **Live Demo:** https://wilgat.github.io/namecard/
 
 ## Features
 
-- Upload any image
-- Crop the image using sliders (X/Y offset, width, height)
-- Add a semi-transparent black banner at the bottom
-- Customize banner height and text font size
-- Edit banner text directly (works on both desktop and mobile)
-- Download the final edited image as PNG
-- Installable as a PWA (works offline after first load)
+- Displays your `namecard.png` (responsive: full-width on mobile, max 800px on desktop)
+- QR code linking back to this page (scan to quickly open on another device)
+- One-tap **"Install App"** button → add to home screen / desktop
+- Fully offline-capable after installation (thanks to Service Worker)
+- Clean dark theme, mobile-first design
 
-## How to Install (Add to Home Screen / Desktop)
+## Screenshots
 
-This app is a **Progressive Web App (PWA)** — you can install it to your device for a native-like experience.
+(Add 1–3 screenshots here later if you want — e.g. mobile view, installed icon, QR scan in action)
 
-### On Mobile (iPhone / Android)
+## How to Use / Install
 
-1. Open the app in your browser:  
-   https://wilgat.github.io/pwa-image-editor/
-2. **If you see a blue banner at the bottom** saying "Install this editor to your home screen...", tap **Add to Home Screen**.
-3. **If you don’t see the banner**:
-   - Look for the **"Install App"** floating button (bottom-right corner)
-   - Tap it → the install prompt will appear
-4. Follow your browser’s instructions to add it to your home screen.
+1. Open https://wilgat.github.io/namecard/
+2. Tap the **Install App** button (floating blue button bottom-right)
+3. Choose "Add to Home Screen" (mobile) or "Install" (desktop Chrome/Edge)
+4. Done! The app icon appears on your home screen / desktop — opens instantly, works offline
 
-### On Desktop (Chrome / Edge)
+## Project Structure
 
-1. Visit: https://wilgat.github.io/pwa-image-editor/
-2. **If a blue install banner appears** at the bottom → click **Add to Home Screen** / **Install**
-3. **If no banner appears**:
-   - Look for the **"Install App"** button (bottom-right)
-   - Click it to show the install prompt
-4. Alternatively, click the **install icon** in the address bar (usually a small computer + down arrow)
-
-**Note for Firefox users:** Firefox desktop has limited native PWA support. You may need the "PWAs for Firefox" extension or use Chrome/Edge for the best install experience.
-
-## How to Use
-
-1. **Upload an image** using the file input
-2. Switch between **Crop** and **Banner** tabs
-   - **Crop tab**: adjust position and size using sliders
-   - **Banner tab**: change banner height (%) and font size
-3. **Add/edit text**:
-   - Click/tap inside the dark banner area at the bottom of the image
-   - On **desktop**: an editable box appears — type and click outside to save
-   - On **mobile**: a comfortable text area pops up — type and tap **Done**
-4. When ready → click **Download Edited Image**
-
-## Works Offline
-
-Once installed (or after the first visit), the app can work offline thanks to the service worker.  
-Perfect for editing images even without internet.
+```
+.
+├── index.html          # Main page (name card + QR + install logic)
+├── manifest.json       # PWA metadata
+├── sw.js               # Service Worker for offline caching
+├── namecard.png        # Your name card image (this is the only real content)
+├── icon-192.png
+└── icon-512.png
+```
 
 ## Technologies
 
-- HTML5 Canvas
-- Vanilla JavaScript (no frameworks)
+- HTML + CSS (vanilla, no framework)
+- Progressive Web App (PWA) features
 - Service Worker for offline support
-- PWA manifest & install prompt
+- Dynamic QR code via quickchart.io (no extra file needed)
 
-Enjoy!  
-Feel free to fork, improve, or report issues.
+## Customization
 
-Made with ❤️ by wilgat
+1. Replace `namecard.png` with your own design
+2. Edit the title, colors, or text in `index.html`
+3. (Optional) Change theme_color / background_color in `manifest.json`
+
+## License
+
+MIT License (or feel free to add your preferred license)
+
+Made with ❤️ by Morris (wilgat)
+```
+
+### Version B – If you added a static `qr.png` file
+
+Just replace the QR code line with this:
+
+```markdown
+- QR code linking back to this page (`qr.png` – fully offline)
+```
+
+And add this line under **Project Structure**:
+
+```
+├── qr.png              # Static QR code image (links to this page)
+```
+
+### Optional short & punchy version (if you prefer minimal README)
+
+```markdown
+# Name Card PWA
+
+Simple offline digital business/name card.
+
+**Live:** https://wilgat.github.io/namecard/
+
+- Shows namecard.png
+- QR code to this page
+- Installable (Add to Home Screen)
+- Works offline
+
+Just replace `namecard.png` with your card and deploy.
+
+Made by Morris
+```
+
+Pick whichever style you like — Version A is more complete and professional-looking.
+
+Let me know if you want to add badges, GitHub stars encouragement, contribution section, or anything else! 😄
