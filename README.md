@@ -38,7 +38,7 @@ This app is a **Progressive Web App (PWA)** — you can install it to your devic
    - Click it to show the install prompt
 4. Alternatively, click the **install icon** in the address bar (usually a small computer + down arrow)
 
-**Note for Firefox users:** Firefox desktop has limited native PWA support. You may need the "PWAs for Firefox" extension or use Chrome/Edge for the best install experience.
+**Note for Firefox users:** Firefox desktop has limited native PWA support. You may need the "PWAs for Firefox" extension or use Chrome/Edge for the best install experience!
 
 ## How to Use
 
